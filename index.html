@@ -888,82 +888,116 @@
             <p>>_ © 2025 Smith Mendes. All systems secure.</p>
         </div>
     </footer>
-
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+      <script>
+          (function(){
+              emailjs.init("VWV3YFXpgBxFjrG2_");
+          })();
+      </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Theme toggle
-            const themeCheckbox = document.getElementById('themeCheckbox');
-            themeCheckbox.addEventListener('change', function() {
-                document.body.setAttribute('data-theme', 
-                    this.checked ? 'light' : 'dark');
-            });
+document.addEventListener('DOMContentLoaded', function() {
 
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    const targetId = this.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
+    // Theme toggle
+    const themeCheckbox = document.getElementById('themeCheckbox');
+    themeCheckbox.addEventListener('change', function() {
+        document.body.setAttribute('data-theme', 
+            this.checked ? 'light' : 'dark');
+    });
+
+    // Smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
                 });
-            });
-
-            // Name animation
-            const name = "Smith Mendes";
-            const nameContainer = document.getElementById('nameAnimation');
-            
-            // Create
-            for (let i = 0; i < name.length; i++) {
-                const span = document.createElement('span');
-                span.textContent = name[i];
-                span.style.display = 'inline-block';
-                span.style.minWidth = name[i] === ' ' ? '0.5em' : 'auto';
-                nameContainer.appendChild(span);
             }
-
-            // Get all the letter spans
-            const nameSpans = Array.from(nameContainer.querySelectorAll('span'));
-            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
-
-            // Function to get a random character
-            function getRandomChar() {
-                return letters.charAt(Math.floor(Math.random() * letters.length));
-            }
-
-            // Hacker-style animation with more iterations
-            nameSpans.forEach((span, index) => {
-                if (span.textContent === ' ') return;
-                
-                let iterations = 0;
-                const totalIterations = 8 + Math.floor(Math.random() * 5);
-                const originalChar = span.textContent;
-                const interval = setInterval(() => {
-                    span.textContent = getRandomChar();
-                    span.style.animation = 'randomLetter 0.1s forwards';
-                    
-                    iterations++;
-                    if (iterations >= totalIterations) {
-                        clearInterval(interval);
-                        span.textContent = originalChar;
-                        span.style.animation = 'revealName 0.4s forwards';
-                    }
-                }, 50 + index * 20);
-            });
-
-            // Terminal-like typing effect for paragraphs
-            const typingElements = document.querySelectorAll('.about-text p, .hero p');
-            typingElements.forEach(el => {
-                el.style.opacity = '1';
-                el.style.transform = 'translateY(0)';
-            });
         });
-    </script>
+    });
+
+    // ===============================
+    // EMAILJS CONTACT FORM
+    // ===============================
+    const contactForm = document.querySelector('.contact-form');
+    const submitButton = contactForm.querySelector('button');
+
+    // Create terminal message element
+    const terminalMessage = document.createElement("p");
+    terminalMessage.style.marginTop = "20px";
+    terminalMessage.style.color = "var(--accent-color)";
+    terminalMessage.style.fontFamily = "'Share Tech Mono', monospace";
+    contactForm.appendChild(terminalMessage);
+
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        submitButton.innerHTML = "> Sending...";
+        submitButton.disabled = true;
+
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            message: document.getElementById('message').value
+        };
+
+        emailjs.send('service_l7m9qqc', 'template_20dkicf', formData)
+        .then(function() {
+            terminalMessage.innerHTML = "> Message transmitted successfully ✔";
+            contactForm.reset();
+        })
+        .catch(function(error) {
+            terminalMessage.innerHTML = "> Transmission failed ✖";
+            console.error(error);
+        })
+        .finally(function() {
+            submitButton.innerHTML = "> Send Message";
+            submitButton.disabled = false;
+        });
+    });
+
+    // ===============================
+    // NAME ANIMATION
+    // ===============================
+    const name = "Smith Mendes";
+    const nameContainer = document.getElementById('nameAnimation');
+
+    for (let i = 0; i < name.length; i++) {
+        const span = document.createElement('span');
+        span.textContent = name[i];
+        span.style.display = 'inline-block';
+        span.style.minWidth = name[i] === ' ' ? '0.5em' : 'auto';
+        nameContainer.appendChild(span);
+    }
+
+    const nameSpans = Array.from(nameContainer.querySelectorAll('span'));
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+
+    function getRandomChar() {
+        return letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+
+    nameSpans.forEach((span, index) => {
+        if (span.textContent === ' ') return;
+        let iterations = 0;
+        const totalIterations = 8 + Math.floor(Math.random() * 5);
+        const originalChar = span.textContent;
+
+        const interval = setInterval(() => {
+            span.textContent = getRandomChar();
+            iterations++;
+            if (iterations >= totalIterations) {
+                clearInterval(interval);
+                span.textContent = originalChar;
+            }
+        }, 50 + index * 20);
+    });
+
+});
+</script>
+
 </body>
 </html>
