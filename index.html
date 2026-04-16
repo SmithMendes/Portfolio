@@ -888,12 +888,6 @@
             <p>>_ © 2025 Smith Mendes. All systems secure.</p>
         </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-      <script>
-          (function(){
-              emailjs.init("VWV3YFXpgBxFjrG2_");
-          })();
-      </script>
     <script>
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -920,7 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ===============================
-    // EMAILJS CONTACT FORM
+    // MONGODB CONTACT FORM
     // ===============================
     const contactForm = document.querySelector('.contact-form');
     const submitButton = contactForm.querySelector('button');
@@ -932,10 +926,10 @@ document.addEventListener('DOMContentLoaded', function() {
     terminalMessage.style.fontFamily = "'Share Tech Mono', monospace";
     contactForm.appendChild(terminalMessage);
 
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        submitButton.innerHTML = "> Sending...";
+        submitButton.innerHTML = "> Transmitting...";
         submitButton.disabled = true;
 
         const formData = {
@@ -944,19 +938,34 @@ document.addEventListener('DOMContentLoaded', function() {
             message: document.getElementById('message').value
         };
 
-        emailjs.send('service_l7m9qqc', 'template_20dkicf', formData)
-        .then(function() {
-            terminalMessage.innerHTML = "> Message transmitted successfully ✔";
-            contactForm.reset();
-        })
-        .catch(function(error) {
-            terminalMessage.innerHTML = "> Transmission failed ✖";
-            console.error(error);
-        })
-        .finally(function() {
+        try {
+            // IMPORTANT: If running locally, keep this as 'http://localhost:5000/api/contact'
+            // Once deployed, change this URL to your deployed backend Vercel URL!
+            const BACKEND_URL = 'http://localhost:5000/api/contact'; // e.g., 'https://my-backend.vercel.app/api/contact'
+            
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                terminalMessage.innerHTML = "> " + result.message + " ✔";
+                contactForm.reset();
+            } else {
+                terminalMessage.innerHTML = "> Transmission failed: " + (result.message || "Unknown error") + " ✖";
+            }
+        } catch (error) {
+            terminalMessage.innerHTML = "> Connection failed. Target refusing connection ✖";
+            console.error('Error:', error);
+        } finally {
             submitButton.innerHTML = "> Send Message";
             submitButton.disabled = false;
-        });
+        }
     });
 
     // ===============================
